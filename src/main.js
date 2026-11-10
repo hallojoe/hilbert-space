@@ -8,6 +8,7 @@ const format = (n) => n.toLocaleString('en-US');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const state = { order: 3, mode: 'wireframe', palette: 'spectrum', revealed: 512, playing: false };
 let renderer, controls, camera, scene, curve, cube, positions, colors, geometry, material, mesh;
+let needsRender = true;
 let total = 512, elapsed = 0, previousTime = 0, revealProgress = 512, toastTimer;
 const baseDistance = 6.5;
 const vector = new THREE.Vector3();
@@ -63,7 +64,7 @@ function buildCurve() {
       material = new THREE.ShaderMaterial({
         vertexColors: true, transparent: true, depthWrite: false,
         blending: THREE.AdditiveBlending,
-        uniforms: { uTime: { value: 0 }, uSize: { value: Number($('point-size').value) }, uPulse: { value: reducedMotion ? 0 : Number($('pulse').value) }, uPixelRatio: { value: renderer.getPixelRatio() } },
+        uniforms: { uTime: { value: 0 }, uSize: { value: Number($('point-size').value) }, uPulse: { value: Number($('pulse').value) }, uPixelRatio: { value: renderer.getPixelRatio() } },
         vertexShader: `attribute float phase;
           uniform float uTime; uniform float uSize; uniform float uPulse; uniform float uPixelRatio;
           varying vec3 vColor; varying float vPulse;
@@ -129,6 +130,7 @@ function buildCurve() {
   $('canvas-container').dataset.mode = state.mode;
 }
 function updateReveal(value) {
+  needsRender = true;
   state.revealed = clampReveal(value, total);
   if (mesh?.isInstancedMesh) mesh.count = Math.max(0, state.revealed - 1);
   else geometry?.setDrawRange(0, state.revealed);
@@ -172,6 +174,7 @@ function resetView() {
   setView('iso');
 }
 function resize() {
+  needsRender = true;
   const { width, height } = $('canvas-container').getBoundingClientRect();
   camera.aspect = width / Math.max(height, 1);
   camera.updateProjectionMatrix();
@@ -207,6 +210,7 @@ function init() {
   controls.maxDistance = baseDistance / 0.35;
   controls.autoRotateSpeed = 1;
   controls.addEventListener('change', () => {
+    needsRender = true;
     const zoom = Math.round(baseDistance / camera.position.distanceTo(controls.target) * 100);
     $('zoom').value = zoom;
     $('zoom-value').textContent = `${zoom}%`;
@@ -234,11 +238,17 @@ function init() {
     }
     if (material.uniforms) material.uniforms.uTime.value = elapsed;
     controls.update(delta);
-    renderer.render(scene, camera);
+    const pulsing = material.uniforms && material.uniforms.uPulse.value > 0;
+    if (needsRender || pulsing) {
+      renderer.render(scene, camera);
+      needsRender = false;
+    }
   });
   $('canvas-container').dataset.ready = 'true';
 }
 function wireControls() {
+  // Static scenes need no GPU redraw until a control or the camera changes.
+  for (const event of ['input', 'change', 'click']) document.addEventListener(event, () => { needsRender = true; });
   $('order').addEventListener('input', () => {
     const ratio = state.revealed / total;
     state.order = Number($('order').value);
