@@ -1,0 +1,15 @@
+{
+  "name": "hilbert-space",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test tests/hilbert.test.js",
+    "test:browser": "playwright test"
+  },
+  "dependencies": { "three": "^0.185.0" },
+  "devDependencies": { "@playwright/test": "^1.58.2", "vite": "^7.3.1" }
+}

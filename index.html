@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#11140f" />
+  <meta name="description" content="Explore a three-dimensional Hilbert curve. Control its order, reveal its path, and experiment with light, texture, and motion." />
+  <title>Hilbert Space — A curve in three dimensions</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2311140f'/%3E%3Cpath d='M10 10v20h8V10h12v20' fill='none' stroke='%23d5f590' stroke-width='3'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="Hilbert Space home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 5v22h8V5h8v22h8V5"/></svg>HILBERT <span>SPACE</span></a>
+    <span class="edition">AN INTERACTIVE STUDY / 001</span>
+    <a class="source-link" href="https://github.com/hallojoe/hilbert-space" target="_blank" rel="noopener">Source code <span aria-hidden="true">↗</span></a>
+  </header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">ONE CONTINUOUS PATH. THREE DIMENSIONS.</p><h1>A little order.<br class="mobile-break" /> Infinite possibility.</h1></div><p class="intro-note">Watch a line find its way through space.<br />Change the rules. Follow the curve.</p></div>
+    <div class="workspace">
+      <aside class="panel" aria-label="Curve controls">
+        <div class="panel-heading"><h2>The experiment</h2><span class="live"><i></i>LIVE</span></div>
+        <section class="control-section">
+          <div class="section-label"><span>01</span><h3>Geometry</h3></div>
+          <label class="field-title" for="order">Curve order <output id="order-value">3</output></label>
+          <input id="order" type="range" min="1" max="6" value="3" step="1" />
+          <div class="range-labels"><span>1 / SIMPLE</span><span>6 / COMPLEX</span></div>
+          <div class="metric-grid"><div><strong id="total-points">512</strong><span>TOTAL POINTS</span></div><div><strong id="grid-size">8 × 8 × 8</strong><span>SPATIAL GRID</span></div></div>
+          <p class="small-note" id="order-note">Every order folds the path into eight smaller copies.</p>
+        </section>
+        <section class="control-section">
+          <div class="section-label"><span>02</span><h3>Appearance</h3></div>
+          <div class="mode-grid" role="group" aria-label="Render style">
+            <button class="mode active" data-mode="wireframe" aria-pressed="true"><span class="mode-icon">⌁</span>Wireframe</button>
+            <button class="mode" data-mode="shaded" aria-pressed="false"><span class="mode-icon">◒</span>Shaded</button>
+            <button class="mode" data-mode="textured" aria-pressed="false"><span class="mode-icon">▧</span>Textured</button>
+            <button class="mode" data-mode="dots" aria-pressed="false"><span class="mode-icon">⠿</span>Blinking dots</button>
+          </div>
+          <label class="field-title" for="palette">Color palette</label>
+          <select id="palette"><option value="spectrum">Spectrum</option><option value="aurora">Aurora</option><option value="ember">Ember</option><option value="lime">Lime</option></select>
+          <div id="dot-controls" hidden>
+            <label class="field-title" for="point-size">Point size <output id="point-size-value">7 px</output></label>
+            <input id="point-size" type="range" min="2" max="24" value="7" />
+            <label class="field-title" for="pulse">Pulse speed <output id="pulse-value">2.0</output></label>
+            <input id="pulse" type="range" min="0" max="8" step="0.1" value="2" />
+          </div>
+          <label class="toggle-row" for="bounds">Bounding cube <input id="bounds" type="checkbox" checked /><span class="switch" aria-hidden="true"></span></label>
+        </section>
+        <section class="control-section camera-section">
+          <div class="section-label"><span>03</span><h3>Camera & motion</h3></div>
+          <div class="view-buttons" role="group" aria-label="Camera view"><button data-view="iso" class="selected">3D</button><button data-view="front">Front</button><button data-view="top">Top</button><button data-view="side">Side</button></div>
+          <label class="field-title" for="zoom">Zoom <output id="zoom-value">100%</output></label><input id="zoom" type="range" min="35" max="250" value="100" />
+          <details><summary>Fine rotation <span>＋</span></summary><div class="rotation-fields"><label for="rotate-x">X <input id="rotate-x" type="range" min="-180" max="180" value="0" /></label><label for="rotate-y">Y <input id="rotate-y" type="range" min="-180" max="180" value="0" /></label><label for="rotate-z">Z <input id="rotate-z" type="range" min="-180" max="180" value="0" /></label></div></details>
+          <label class="toggle-row" for="auto-rotate">Auto rotate <input id="auto-rotate" type="checkbox" /><span class="switch" aria-hidden="true"></span></label>
+          <label class="field-title" for="rotation-speed">Rotation speed <output id="rotation-speed-value">1.0×</output></label><input id="rotation-speed" type="range" min="-3" max="3" step="0.1" value="1" />
+          <button id="reset" class="reset">↺ <span>Reset view</span></button>
+        </section>
+      </aside>
+      <div class="right-column">
+        <section class="viewport" aria-label="Interactive 3D Hilbert curve">
+          <div class="viewport-top"><span><i class="status-dot"></i> <span id="style-label">WIREFRAME</span> <span class="subtle">/ THREE.JS</span></span><div class="viewport-actions"><button id="snapshot" title="Download image" aria-label="Download image">↓</button><button id="fullscreen" title="Toggle fullscreen" aria-label="Toggle fullscreen">⛶</button></div></div>
+          <div id="canvas-container"><div id="render-error" hidden role="alert">This browser could not start WebGL. Enable hardware acceleration or try a recent browser.</div></div>
+          <div class="viewport-bottom"><span class="axis-legend"><b>X</b><b>Y</b><b>Z</b><span>3D SPACE</span></span><span class="gesture-hint">DRAG TO ORBIT <i>·</i> SCROLL TO ZOOM <i>·</i> RIGHT-DRAG TO PAN</span></div>
+          <div id="toast" class="toast" role="status"></div>
+        </section>
+        <section class="reveal-panel" aria-label="Reveal the curve">
+          <div class="reveal-heading"><div><h2>Follow the path</h2><p>Reveal the curve, one point at a time.</p></div><span id="reveal-percent">100<span>%</span></span></div>
+          <div class="timeline"><button id="play" class="play" aria-label="Animate reveal" aria-pressed="false">▶</button><div class="timeline-track"><label class="sr-only" for="reveal">Revealed points</label><input id="reveal" type="range" min="0" max="512" value="512" /><div class="range-labels"><span>START</span><span id="reveal-caption">512 / 512 POINTS</span><span>END</span></div></div></div>
+          <div class="playback-options"><label for="revealed-number">Revealed points <input id="revealed-number" type="number" min="0" max="512" value="512" /></label><label for="duration">Duration <select id="duration"><option value="5">5 sec</option><option value="12" selected>12 sec</option><option value="30">30 sec</option><option value="60">60 sec</option></select></label><label class="loop-label" for="loop"><input id="loop" type="checkbox" checked />Loop</label></div>
+        </section>
+      </div>
+    </div>
+    <footer><p>A space-filling idea, discovered by David Hilbert in 1891.</p><p>Finite steps. An infinite limit. <span>H³</span></p></footer>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
