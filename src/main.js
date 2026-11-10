@@ -253,9 +253,9 @@ function wireControls() {
     $('order-note').textContent = state.order >= 5 ? 'Dense geometry. Wireframe and dots are the lightest modes.' : 'Every order folds the path into eight smaller copies.';
     buildCurve();
   });
-  document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('button[data-mode]').forEach(button => button.addEventListener('click', () => {
     state.mode = button.dataset.mode;
-    document.querySelectorAll('[data-mode]').forEach(item => {
+    document.querySelectorAll('button[data-mode]').forEach(item => {
       item.classList.toggle('active', item === button);
       item.setAttribute('aria-pressed', String(item === button));
     });

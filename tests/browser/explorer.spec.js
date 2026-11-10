@@ -20,7 +20,7 @@ test('renders every style, reveals exact counts, and responds to camera and play
   await range(page, 'order', 2);
   await expect(page.locator('#total-points')).toHaveText('64');
   for (const mode of ['wireframe', 'shaded', 'textured', 'dots']) {
-    await page.locator(`[data-mode="${mode}"]`).click();
+    await page.locator(`button[data-mode="${mode}"]`).click();
     await expect(stage).toHaveAttribute('data-mode', mode);
     for (const count of [0, 1, 32, 64]) {
       await range(page, 'reveal', count);
@@ -52,7 +52,7 @@ test('renders every style, reveals exact counts, and responds to camera and play
   await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'true');
   await expect(stage).toHaveAttribute('data-revealed', '64', { timeout: 15000 });
   await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'false');
-  await page.locator('[data-mode="wireframe"]').click();
+  await page.locator('button[data-mode="wireframe"]').click();
   await range(page, 'order', 6);
   await expect(page.locator('#total-points')).toHaveText('262,144');
   await expect(stage).toHaveAttribute('data-revealed', '262144');
